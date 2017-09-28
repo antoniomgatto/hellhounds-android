@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "415246737910",
+    "firebase_url": "https://hellhounds-f1236.firebaseio.com",
+    "project_id": "hellhounds-f1236",
+    "storage_bucket": "hellhounds-f1236.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:415246737910:android:e41cc70d2b4a3de9",
+        "android_client_info": {
+          "package_name": "br.com.hellhounds"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "415246737910-aadcp423orihv5rueq27rsh9gdeao9ub.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCETr6onyEAwTN_ZJ59RWWX-cAj7Qy1nQI"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
