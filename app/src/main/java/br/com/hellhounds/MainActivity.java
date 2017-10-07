@@ -1,5 +1,6 @@
 package br.com.hellhounds;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -8,6 +9,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -45,6 +47,14 @@ public class MainActivity extends AppCompatActivity {
 
         mSensorListView = (ListView) findViewById(R.id.sensor_list);
         mSensorListView.setEmptyView(findViewById(android.R.id.empty));
+        mSensorListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                Sensor sensor = mAdapter.getItem(position);
+                Intent intent = new Intent(MainActivity.this, SensorViewActivity.class);
+                startActivity(intent);
+            }
+        });
 
         mAdapter = new CustomAdapter();
         mSensorListView.setAdapter(mAdapter);
