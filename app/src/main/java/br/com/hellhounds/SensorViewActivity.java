@@ -1,11 +1,20 @@
 package br.com.hellhounds;
 
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.format.DateFormat;
+import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.LegendRenderer;
 import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter;
@@ -17,64 +26,113 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Random;
 
 public class SensorViewActivity extends AppCompatActivity {
 
-    GraphView mGraphView;
+    private static final String SENSOR_ID_PARAM = "SENSOR_ID";
+
+    private GraphView mGraphView;
+    private DatabaseReference mDatabase;
+    private List<Sensor> mSensorHistoryList;
+    private Date mMinDate;
+
+    private String mSensorId;
+
+    public static Intent newIntent(Context context, String sensorId) {
+        Intent intent = new Intent(context, SensorViewActivity.class);
+        intent.putExtra(SENSOR_ID_PARAM, sensorId);
+        return intent;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sensor_view);
 
+        mSensorId = getIntent().getStringExtra(SENSOR_ID_PARAM);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
+        mGraphView = (GraphView) findViewById(R.id.sensor_graph);
+
+        mSensorHistoryList = new ArrayList<Sensor>();
+
+        setupDB();
+    }
+
+    private void showGraph() {
+
         List<DataPoint> dataPoints = new ArrayList<>();
 
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(new Date());
-        for (int i = 0; i <= 48; i++) {
-            calendar.add(Calendar.MINUTE, 30);
-            Logger.d("teste " + calendar.get(Calendar.HOUR_OF_DAY));
-            dataPoints.add(new DataPoint(calendar.getTime(), new Random().nextInt(25)));
+        for(Sensor sensor : mSensorHistoryList) {
+            dataPoints.add(new DataPoint(new Date(sensor.getUpdatedAt()), sensor.getCurrentTemperature()));
         }
 
-        Calendar now = Calendar.getInstance();
-        Date maxDate = now.getTime();
-        now.add(Calendar.HOUR, -24);
-        Date minDate = now.getTime();
-
-        mGraphView = (GraphView) findViewById(R.id.sensor_graph);
         LineGraphSeries<DataPoint> series = new LineGraphSeries<>(dataPoints.toArray(new DataPoint[]{}));
         series.setTitle(getString(R.string.label_graph_temperatura));
         series.setBackgroundColor(Color.BLACK);
         series.setDrawDataPoints(true);
         mGraphView.addSeries(series);
 
+        mGraphView.getViewport().setMaxY(30);
+        mGraphView.getViewport().setMinY(-10);
+        mGraphView.getViewport().setYAxisBoundsManual(true);
+        mGraphView.getGridLabelRenderer().setNumVerticalLabels(5);
+
+        mGraphView.getLegendRenderer().setVisible(true);
+        mGraphView.getLegendRenderer().setAlign(LegendRenderer.LegendAlign.TOP);
+
         // set date label formatter
         mGraphView.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(this, DateFormat.getTimeFormat(this)));
         mGraphView.getGridLabelRenderer().setNumHorizontalLabels(4);
 
-        // set manual x bounds to have nice steps
-//        mGraphView.getViewport().setMinX(minDate.getTime());
-//        mGraphView.getViewport().setMaxX(maxDate.getTime());
+//        mGraphView.getViewport().setScalableY(true);
+//        mGraphView.getViewport().setScrollableY(true);
+
+//       set manual x bounds to have nice steps
+//        mGraphView.getViewport().setMinX(mMinDate.getTime());
+//        mGraphView.getViewport().setMaxX(mMaxDate.getTime());
 //        mGraphView.getViewport().setXAxisBoundsManual(true);
+        mGraphView.invalidate();
 
-        mGraphView.getViewport().setMaxY(30);
-        mGraphView.getViewport().setMinY(-10);
-        mGraphView.getViewport().setYAxisBoundsManual(true);
+    }
 
-        // as we use dates as labels, the human rounding to nice readable numbers
-        // is not nessecary
-        mGraphView.getGridLabelRenderer().setHumanRounding(false);
+    private void setupDB() {
+        mDatabase = FirebaseDatabase.getInstance().getReference();
 
-        mGraphView.getViewport().setScalable(true);
-        mGraphView.getViewport().setScalableY(true);
+        // find min date
+        Calendar now = Calendar.getInstance();
+        now.add(Calendar.HOUR, -24);
+        mMinDate= now.getTime();
 
-        mGraphView.getLegendRenderer().setVisible(true);
-        mGraphView.getLegendRenderer().setAlign(LegendRenderer.LegendAlign.TOP);
+        Logger.d("sensorId " + mSensorId);
+
+        Query query =  mDatabase.child("sensors_history")
+                                .child(mSensorId)
+                                .orderByChild("updatedAt")
+                                .startAt(mMinDate.getTime());
+
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                mSensorHistoryList = new ArrayList<Sensor>();
+
+                for(DataSnapshot snapshot: dataSnapshot.getChildren()) {
+                    Sensor sensor = snapshot.getValue(Sensor.class);
+                    Logger.d("Data do updatedAt " + new Date(sensor.getUpdatedAt()));
+                    mSensorHistoryList.add(sensor);
+                }
+
+                showGraph();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Toast.makeText(SensorViewActivity.this, getString(R.string.message_general_firebase_problem), Toast.LENGTH_LONG).show();
+            }
+        });
     }
 }

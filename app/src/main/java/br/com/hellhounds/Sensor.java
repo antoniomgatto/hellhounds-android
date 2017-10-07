@@ -50,4 +50,8 @@ public class Sensor {
     public void setUpdatedAt(Long updatedAt) {
         this.updatedAt = updatedAt;
     }
+
+    public String getFirebaseId() {
+        return this.arduino + "-" + this.id;
+    }
 }

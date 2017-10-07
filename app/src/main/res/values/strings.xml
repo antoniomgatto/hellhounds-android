@@ -12,7 +12,7 @@
     <string name="label_current_temperature">Última temperatura registrada</string>
     <string name="label_target_temperature">Temperatura programada</string>
     <string name="label_update_at">Última atualização</string>
-    <string name="message_general_firebase_problem">Não foi possível sincronizar ps dados</string>
+    <string name="message_general_firebase_problem">Não foi possível sincronizar obter dados do banco</string>
     <string name="message_empty_sensor_list">Nenhum sensor encontrado</string>
     <string name="label_graph_temperatura">Temperatura</string>
 

@@ -1,6 +1,5 @@
 package br.com.hellhounds;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -20,7 +19,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.orhanobut.logger.Logger;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -28,8 +26,6 @@ import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-
-    static final String TAG = MainActivity.class.getSimpleName();
 
     private DatabaseReference mDatabase;
     private ListView mSensorListView;
@@ -51,8 +47,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                 Sensor sensor = mAdapter.getItem(position);
-                Intent intent = new Intent(MainActivity.this, SensorViewActivity.class);
-                startActivity(intent);
+                startActivity(SensorViewActivity.newIntent(MainActivity.this, sensor.getFirebaseId()));
             }
         });
 
@@ -69,10 +64,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
-                List<Sensor> tmpSensorList = new ArrayList<Sensor>();
+                List<Sensor> tmpSensorList = new ArrayList<>();
 
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    Logger.d(snapshot);
                     Sensor sensor = snapshot.getValue(Sensor.class);
                     tmpSensorList.add(sensor);
                 }
