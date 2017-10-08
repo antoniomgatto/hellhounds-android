@@ -1,10 +1,13 @@
 <resources>
     <string name="app_name">HellHounds</string>
+    <string name="button_positive">OK</string>
+    <string name="button_negative">Cancelar</string>
     <string name="initial_value_contador">Não encontrado</string>
     <string name="initial_value_temperatura">Não encontrado</string>
     <string name="label_contador">Contador</string>
     <string name="label_temperatura">Temperatura</string>
     <string name="button_incrementar">Incrementar</string>
+    <string name="label_dialog_new_temperature">Informe a nova temperatura</string>
     <string name="label_graus_celsius">%1$dºC</string>
 
     <string name="label_sensor_id">Sensor</string>
@@ -15,5 +18,6 @@
     <string name="message_general_firebase_problem">Não foi possível sincronizar obter dados do banco</string>
     <string name="message_empty_sensor_list">Nenhum sensor encontrado</string>
     <string name="label_graph_temperatura">Temperatura</string>
+    <string name="message_temperature_save_success">A temperatura foi salva e será enviada para o arduino</string>
 
 </resources>

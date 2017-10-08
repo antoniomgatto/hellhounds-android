@@ -23,6 +23,6 @@
         </activity>
         <activity android:name=".SensorViewActivity"
             android:theme="@style/AppTheme.NoActionBar"/>
-    </application>
 
+    </application>
 </manifest>

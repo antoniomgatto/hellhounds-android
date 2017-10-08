@@ -1,15 +1,22 @@
 package br.com.hellhounds;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.format.DateFormat;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,6 +36,7 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 public class SensorViewActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
@@ -225,5 +233,76 @@ public class SensorViewActivity extends AppCompatActivity implements AdapterView
     @Override
     public void onNothingSelected(AdapterView<?> adapterView) {
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.sensor_view, menu);
+        menu.getItem(0).setIcon(ContextCompat.getDrawable(this, R.drawable.ic_settings_white_24dp));
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case R.id.menu_set_temperature:
+
+                    LayoutInflater inflater = LayoutInflater.from(this);
+                    View dialogView = inflater.inflate(R.layout.dialog_temperature, null);
+                    final TextView temperatureView = dialogView.findViewById(R.id.temperature_view);
+                    final SeekBar seekBar = dialogView.findViewById(R.id.temperature_seekbar);
+                    seekBar.setMax(30);
+                    seekBar.setKeyProgressIncrement(1);
+                    seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                        @Override
+                        public void onProgressChanged(SeekBar seekBar, int progress, boolean b) {
+                            temperatureView.setText(getString(R.string.label_graus_celsius, progress));
+                        }
+
+                        @Override
+                        public void onStartTrackingTouch(SeekBar seekBar) {
+
+                        }
+
+                        @Override
+                        public void onStopTrackingTouch(SeekBar seekBar) {
+
+                        }
+                    });
+
+                    final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+                    dialogBuilder.setTitle(getString(R.string.label_dialog_new_temperature));
+                    dialogBuilder.setView(dialogView);
+                    dialogBuilder.setPositiveButton(getString(R.string.button_positive), new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int i) {
+
+                            HashMap<String, Object> payload = new HashMap<String, Object>();
+                            payload.put("temperature", seekBar.getProgress());
+
+                            mDatabase.child("sensors_config").child(mSensorId).setValue(payload);
+
+                            Toast.makeText(SensorViewActivity.this, getString(R.string.message_temperature_save_success), Toast.LENGTH_LONG).show();
+                            dialog.dismiss();
+                        }
+                    });
+                    dialogBuilder.setNegativeButton(getString(R.string.button_negative), new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int i) {
+                            dialog.dismiss();
+                        }
+                    });
+
+                    //init data
+                    temperatureView.setText(getString(R.string.label_graus_celsius, mSensor.getTargetTemperature()));
+                    seekBar.setProgress(mSensor.getTargetTemperature());
+
+                    dialogBuilder.create();
+                    dialogBuilder.show();
+                break;
+        }
+
+        return true;
     }
 }
