@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="graph_period_options">
+        <item>Últimas 24h</item>
+        <item>Última semana</item>
+        <item>Tudo</item>
+    </string-array>
+</resources>

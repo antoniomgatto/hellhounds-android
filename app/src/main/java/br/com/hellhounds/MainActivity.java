@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
                 List<Sensor> tmpSensorList = new ArrayList<>();
 
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    Sensor sensor = snapshot.getValue(Sensor.class);
+                        Sensor sensor = snapshot.getValue(Sensor.class);
                     tmpSensorList.add(sensor);
                 }
 

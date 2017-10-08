@@ -1,22 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="br.com.hellhounds.SensorViewActivity">
-
-    <include layout="@layout/toolbar"
-        android:id="@+id/sensor_toolbar"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="match_parent">
 
-    <com.jjoe64.graphview.GraphView
-        android:id="@+id/sensor_graph"
-        android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:layout_below="@id/sensor_toolbar"/>
+        <include layout="@layout/toolbar"
+            android:id="@+id/sensor_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
 
-</RelativeLayout>
+        <include layout="@layout/row_sensor"
+            android:id="@+id/sensor_info_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/sensor_toolbar"/>
+
+        <LinearLayout
+            android:id="@+id/sensor_graph_block"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_below="@id/sensor_info_view">
+
+            <Spinner android:id="@+id/sensor_graph_period_selector"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"/>
+
+            <com.jjoe64.graphview.GraphView
+                android:id="@+id/sensor_graph"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"/>
+        </LinearLayout>
+    </RelativeLayout>
+</ScrollView>
 
