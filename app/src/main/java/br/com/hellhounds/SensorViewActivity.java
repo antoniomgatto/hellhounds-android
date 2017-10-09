@@ -135,11 +135,11 @@ public class SensorViewActivity extends AppCompatActivity implements AdapterView
         // set date label formatter
         if (mPeriodSelected == PERIOD_LAST_24_HOURS_SELECTED) {
             mGraphView.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(this, DateFormat.getTimeFormat(this)));
-            mGraphView.getGridLabelRenderer().setNumHorizontalLabels(4);
         } else {
             mGraphView.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(this, DateFormat.getDateFormat(this)));
-            mGraphView.getGridLabelRenderer().setNumHorizontalLabels(3);
         }
+
+        mGraphView.getGridLabelRenderer().setNumHorizontalLabels(3);
 
         mGraphView.getViewport().setScalable(true);
         mGraphView.getViewport().setScalableY(true);
@@ -279,9 +279,9 @@ public class SensorViewActivity extends AppCompatActivity implements AdapterView
                         public void onClick(DialogInterface dialog, int i) {
 
                             HashMap<String, Object> payload = new HashMap<String, Object>();
-                            payload.put("temperature", seekBar.getProgress());
+                            payload.put(mSensor.getId(), seekBar.getProgress());
 
-                            mDatabase.child("sensors_config").child(mSensorId).setValue(payload);
+                            mDatabase.child("sensors_config").child(mSensor.getArduino()).setValue(payload);
 
                             Toast.makeText(SensorViewActivity.this, getString(R.string.message_temperature_save_success), Toast.LENGTH_LONG).show();
                             dialog.dismiss();
