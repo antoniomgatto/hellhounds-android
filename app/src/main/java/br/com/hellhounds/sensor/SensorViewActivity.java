@@ -1,4 +1,4 @@
-package br.com.hellhounds;
+package br.com.hellhounds.sensor;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -38,6 +38,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+
+import br.com.hellhounds.R;
 
 public class SensorViewActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 

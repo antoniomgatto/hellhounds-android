@@ -1,4 +1,4 @@
-package br.com.hellhounds;
+package br.com.hellhounds.sensor;
 
 public class Sensor {
 

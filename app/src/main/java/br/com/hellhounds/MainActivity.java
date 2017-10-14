@@ -1,17 +1,12 @@
 package br.com.hellhounds;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
@@ -20,41 +15,44 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+import br.com.hellhounds.sensor.Sensor;
+import br.com.hellhounds.sensor.SensorViewActivity;
+import br.com.hellhounds.sensor.SensorsAdapter;
+import br.com.hellhounds.utils.RecyclerViewClickListener;
 
+public class MainActivity extends AppCompatActivity implements RecyclerViewClickListener {
+
+    private RecyclerView mSensorListView;
+    private SensorsAdapter mAdapter;
+    private List<Sensor> mSensorList = new ArrayList<>();
     private DatabaseReference mDatabase;
-    private ListView mSensorListView;
-    private List<Sensor> mSensorList = new ArrayList<Sensor>();
-    private CustomAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        mSensorListView = (ListView) findViewById(R.id.sensor_list);
-        mSensorListView.setEmptyView(findViewById(android.R.id.empty));
-        mSensorListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                Sensor sensor = mAdapter.getItem(position);
-                startActivity(SensorViewActivity.newIntent(MainActivity.this, sensor.getFirebaseId()));
-            }
-        });
+        mSensorListView = findViewById(R.id.sensors_list);
 
-        mAdapter = new CustomAdapter();
+        mAdapter = new SensorsAdapter(this, mSensorList, this);
+        mSensorListView.setLayoutManager(new LinearLayoutManager(this));
+        mSensorListView.setItemAnimator(new DefaultItemAnimator());
         mSensorListView.setAdapter(mAdapter);
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
+    }
+
+    @Override
+    protected void onResume() {
+
+        super.onResume();
 
         getData();
     }
@@ -67,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
                 List<Sensor> tmpSensorList = new ArrayList<>();
 
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                        Sensor sensor = snapshot.getValue(Sensor.class);
+                    Sensor sensor = snapshot.getValue(Sensor.class);
                     tmpSensorList.add(sensor);
                 }
 
@@ -83,54 +81,9 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public class CustomAdapter extends ArrayAdapter<Sensor>  {
-
-        private class ViewHolder {
-            final TextView sensorIdView;
-            final TextView arduinoView;
-            final TextView currentTemperatureView;
-            final TextView targetTemperaturaView;
-            final TextView updateAtView;
-
-            public ViewHolder(View view) {
-                sensorIdView = (TextView) view.findViewById(R.id.sensorId);
-                arduinoView = (TextView) view.findViewById(R.id.arduino);
-                currentTemperatureView = (TextView) view.findViewById(R.id.currentTemperature);
-                targetTemperaturaView = (TextView) view.findViewById(R.id.targetTemperature);
-                updateAtView = (TextView) view.findViewById(R.id.updateAt);
-            }
-        }
-
-
-        public CustomAdapter() {
-            super(MainActivity.this, R.layout.row_sensor, mSensorList);
-        }
-
-        @NonNull
-        @Override
-        public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-
-            Sensor sensor = mSensorList.get(position);
-
-            View view;
-            ViewHolder viewHolder;
-
-            if (convertView == null) {
-                view = LayoutInflater.from(getContext()).inflate(R.layout.row_sensor, parent, false);
-                viewHolder = new ViewHolder(view);
-                view.setTag(viewHolder);
-            } else {
-                view = convertView;
-                viewHolder = (ViewHolder) view.getTag();
-            }
-
-            viewHolder.sensorIdView.setText(sensor.getId());
-            viewHolder.arduinoView.setText(sensor.getArduino());
-            viewHolder.currentTemperatureView.setText(getString(R.string.label_graus_celsius, sensor.getCurrentTemperature()));
-            viewHolder.targetTemperaturaView.setText(getString(R.string.label_graus_celsius, sensor.getTargetTemperature()));
-            viewHolder.updateAtView.setText(DateFormat.getDateTimeInstance().format(new Date(sensor.getUpdatedAt())));
-
-            return view;
-        }
+    @Override
+    public void onClick(View view, int position) {
+        Sensor sensor = mSensorList.get(position);
+        startActivity(SensorViewActivity.newIntent(MainActivity.this, sensor.getFirebaseId()));
     }
 }
