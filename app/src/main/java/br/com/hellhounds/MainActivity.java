@@ -1,6 +1,7 @@
 package br.com.hellhounds;
 
 import android.os.Bundle;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -84,6 +85,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewClick
     @Override
     public void onClick(View view, int position) {
         Sensor sensor = mSensorList.get(position);
-        startActivity(SensorViewActivity.newIntent(MainActivity.this, sensor.getFirebaseId()));
+        ActivityOptionsCompat options = ActivityOptionsCompat.makeCustomAnimation(this, android.R.anim.fade_in, android.R.anim.fade_out);
+        startActivity(SensorViewActivity.newIntent(MainActivity.this, sensor.getFirebaseId()), options.toBundle());
     }
 }
